@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Survey - Questionnaire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e6f0fa 0%, #f6f8fc 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+        h1 {
+            color: #1a3c5e;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        form {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+        }
+        .question-card {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .question-card.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .question-card:nth-child(even).active {
+            transform: translateX(0);
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c4b73;
+            line-height: 1.0;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="number"], select {
+            padding: 12px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            color: #374151;
+            font-size: 1rem;
+            padding: 10px 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        .radio-group input {
+            display: none;
+        }
+        .radio-group input:checked + label {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        .radio-group label:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .nav-button, button[type="submit"] {
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+        .nav-button:hover, button[type="submit"]:hover {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .nav-button:active, button[type="submit"]:active {
+            transform: translateY(0);
+        }
+        .nav-button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            transition: width 0.5s ease;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            form {
+                padding: 20px;
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .radio-group label {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .nav-button, button[type="submit"] {
+                padding: 10px;
+            }
+        }
+        @media (max-width: 400px) {
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .radio-group label {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mental Health Survey</h1>
+        <form action="/predict" method="POST">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 4.35%;"></div>
+            </div>
+            <!-- Question 1: Age -->
+            <div class="question-card active" id="q1">
+                <div class="question-text">How old are you?</div>
+                <div class="input-group">
+                    <input type="number" id="age" name="age" required min="0" max="150">
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" disabled>Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q1', 'q2')">Next</button>
+                </div>
+            </div>
+            <!-- Question 2: Gender -->
+            <div class="question-card" id="q2">
+                <div class="question-text">What is your gender?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="male" name="gender" value="Male" required>
+                        <label for="male">Male</label>
+                        <input type="radio" id="female" name="gender" value="Female">
+                        <label for="female">Female</label>
+                        <input type="radio" id="other" name="gender" value="Other">
+                        <label for="other">Other</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q2', 'q1')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q2', 'q3')">Next</button>
+                </div>
+            </div>
+            <!-- Question 3: Country -->
+            <div class="question-card" id="q3">
+                <div class="question-text">Which country do you live in?</div>
+                <div class="input-group">
+                    <select id="country" name="country" required>
+                        <option value="">Select Country</option>
+                        <option value="United States">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Bulgaria">Bulgaria</option>
+                        <option value="France">France</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Poland">Poland</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Russia">Russia</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Slovenia">Slovenia</option>
+                        <option value="Costa Rica">Costa Rica</option>
+                        <option value="Austria">Austria</option>
+                        <option value="Ireland">Ireland</option>
+                        <option value="India">India</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Sweden">Sweden</option>
+                        <option value="Colombia">Colombia</option>
+                        <option value="Latvia">Latvia</option>
+                        <option value="Romania">Romania</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="New Zealand">New Zealand</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Finland">Finland</option>
+                        <option value="Uruguay">Uruguay</option>
+                        <option value="Israel">Israel</option>
+                        <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                        <option value="Hungary">Hungary</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Nigeria">Nigeria</option>
+                        <option value="Croatia">Croatia</option>
+                        <option value="Norway">Norway</option>
+                        <option value="Thailand">Thailand</option>
+                        <option value="Denmark">Denmark</option>
+                        <option value="Bahamas, The">Bahamas, The</option>
+                        <option value="Greece">Greece</option>
+                        <option value="Moldova">Moldova</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="China">China</option>
+                        <option value="Czech Republic">Czech Republic</option>
+                        <option value="Philippines">Philippines</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q3', 'q2')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q3', 'q4')">Next</button>
+                </div>
+            </div>
+            <!-- Question 4: State -->
+            <div class="question-card" id="q4">
+                <div class="question-text">Which state do you live in?</div>
+                <div class="input-group">
+                    <select id="state" name="state" required>
+                        <option value="">Select State</option>
+                        <option value="IL">IL</option>
+                        <option value="IN">IN</option>
+                        <option value="TX">TX</option>
+                        <option value="TN">TN</option>
+                        <option value="MI">MI</option>
+                        <option value="OH">OH</option>
+                        <option value="CA">CA</option>
+                        <option value="CT">CT</option>
+                        <option value="MD">MD</option>
+                        <option value="NY">NY</option>
+                        <option value="NC">NC</option>
+                        <option value="MA">MA</option>
+                        <option value="IA">IA</option>
+                        <option value="PA">PA</option>
+                        <option value="WA">WA</option>
+                        <option value="WI">WI</option>
+                        <option value="UT">UT</option>
+                        <option value="NM">NM</option>
+                        <option value="OR">OR</option>
+                        <option value="FL">FL</option>
+                        <option value="MN">MN</option>
+                        <option value="MO">MO</option>
+                        <option value="AZ">AZ</option>
+                        <option value="CO">CO</option>
+                        <option value="GA">GA</option>
+                        <option value="DC">DC</option>
+                        <option value="NE">NE</option>
+                        <option value="WV">WV</option>
+                        <option value="OK">OK</option>
+                        <option value="KS">KS</option>
+                        <option value="VA">VA</option>
+                        <option value="NH">NH</option>
+                        <option value="KY">KY</option>
+                        <option value="AL">AL</option>
+                        <option value="NV">NV</option>
+                        <option value="NJ">NJ</option>
+                        <option value="SC">SC</option>
+                        <option value="VT">VT</option>
+                        <option value="SD">SD</option>
+                        <option value="ID">ID</option>
+                        <option value="MS">MS</option>
+                        <option value="RI">RI</option>
+                        <option value="WY">WY</option>
+                        <option value="LA">LA</option>
+                        <option value="ME">ME</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q4', 'q3')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q4', 'q5')">Next</button>
+                </div>
+            </div>
+            <!-- Question 5: Self Employed -->
+            <div class="question-card" id="q5">
+                <div class="question-text">Are you self-employed?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="self_employed_yes" name="self_employed" value="Yes" required>
+                        <label for="self_employed_yes">Yes</label>
+                        <input type="radio" id="self_employed_no" name="self_employed" value="No">
+                        <label for="self_employed_no">No</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q5', 'q4')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q5', 'q6')">Next</button>
+                </div>
+            </div>
+            <!-- Question 6: Family History -->
+            <div class="question-card" id="q6">
+                <div class="question-text">Do you have a family history of mental health issues?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="family_history_yes" name="family_history" value="Yes" required>
+                        <label for="family_history_yes">Yes</label>
+                        <input type="radio" id="family_history_no" name="family_history" value="No">
+                        <label for="family_history_no">No</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q6', 'q5')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q6', 'q7')">Next</button>
+                </div>
+            </div>
+            <!-- Question 7: Work Interfere -->
+            <div class="question-card" id="q7">
+                <div class="question-text">How often does mental health interfere with your work?</div>
+                <div class="input-group">
+                    <select id="work_interfere" name="work_interfere" required>
+                        <option value="">Select Option</option>
+                        <option value="Often">Often</option>
+                        <option value="Rarely">Rarely</option>
+                        <option value="Never">Never</option>
+                        <option value="Sometimes">Sometimes</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q7', 'q6')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q7', 'q8')">Next</button>
+                </div>
+            </div>
+            <!-- Question 8: Number of Employees -->
+            <div class="question-card" id="q8">
+                <div class="question-text">How many employees does your company have?</div>
+                <div class="input-group">
+                    <select id="no_employees" name="no_employees" required>
+                        <option value="">Select Option</option>
+                        <option value="1-5">1-5</option>
+                        <option value="6-25">6-25</option>
+                        <option value="26-100">26-100</option>
+                        <option value="100-500">100-500</option>
+                        <option value="500-1000">500-1000</option>
+                        <option value="More than 1000">More than 1000</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q8', 'q7')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q8', 'q9')">Next</button>
+                </div>
+            </div>
+            <!-- Question 9: Remote Work -->
+            <div class="question-card" id="q9">
+                <div class="question-text">Do you work remotely?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="remote_work_yes" name="remote_work" value="Yes" required>
+                        <label for="remote_work_yes">Yes</label>
+                        <input type="radio" id="remote_work_no" name="remote_work" value="No">
+                        <label for="remote_work_no">No</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q9', 'q8')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q9', 'q10')">Next</button>
+                </div>
+            </div>
+            <!-- Question 10: Tech Company -->
+            <div class="question-card" id="q10">
+                <div class="question-text">Do you work for a tech company?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="tech_company_yes" name="tech_company" value="Yes" required>
+                        <label for="tech_company_yes">Yes</label>
+                        <input type="radio" id="tech_company_no" name="tech_company" value="No">
+                        <label for="tech_company_no">No</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q10', 'q9')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q10', 'q11')">Next</button>
+                </div>
+            </div>
+            <!-- Question 11: Benefits -->
+            <div class="question-card" id="q11">
+                <div class="question-text">Does your employer provide mental health benefits?</div>
+                <div class="input-group">
+                    <select id="benefits" name="benefits" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q11', 'q10')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q11', 'q12')">Next</button>
+                </div>
+            </div>
+            <!-- Question 12: Care Options -->
+            <div class="question-card" id="q12">
+                <div class="question-text">Are you aware of mental health care options at your workplace?</div>
+                <div class="input-group">
+                    <select id="care_options" name="care_options" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Not sure">Not sure</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q12', 'q11')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q12', 'q13')">Next</button>
+                </div>
+            </div>
+            <!-- Question 13: Wellness Program -->
+            <div class="question-card" id="q13">
+                <div class="question-text">Does your employer have a wellness program?</div>
+                <div class="input-group">
+                    <select id="wellness_program" name="wellness_program" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q13', 'q12')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q13', 'q14')">Next</button>
+                </div>
+            </div>
+            <!-- Question 14: Seek Help -->
+            <div class="question-card" id="q14">
+                <div class="question-text">Has your employer provided resources to seek mental health help?</div>
+                <div class="input-group">
+                    <select id="seek_help" name="seek_help" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q14', 'q13')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q14', 'q15')">Next</button>
+                </div>
+            </div>
+            <!-- Question 15: Anonymity -->
+            <div class="question-card" id="q15">
+                <div class="question-text">Is your anonymity protected when using mental health resources?</div>
+                <div class="input-group">
+                    <select id="anonymity" name="anonymity" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q15', 'q14')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q15', 'q16')">Next</button>
+                </div>
+            </div>
+            <!-- Question 16: Leave -->
+            <div class="question-card" id="q16">
+                <div class="question-text">How easy is it to take leave for mental health reasons?</div>
+                <div class="input-group">
+                    <select id="leave" name="leave" required>
+                        <option value="">Select Option</option>
+                        <option value="Very easy">Very easy</option>
+                        <option value="Somewhat easy">Somewhat easy</option>
+                        <option value="Somewhat difficult">Somewhat difficult</option>
+                        <option value="Very difficult">Very difficult</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q16', 'q15')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q16', 'q17')">Next</button>
+                </div>
+            </div>
+            <!-- Question 17: Mental Health Consequence -->
+            <div class="question-card" id="q17">
+                <div class="question-text">Do you think discussing mental health at work would have negative consequences?</div>
+                <div class="input-group">
+                    <select id="mental_health_consequence" name="mental_health_consequence" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Maybe">Maybe</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q17', 'q16')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q17', 'q18')">Next</button>
+                </div>
+            </div>
+            <!-- Question 18: Physical Health Consequence -->
+            <div class="question-card" id="q18">
+                <div class="question-text">Do you think discussing physical health at work would have negative consequences?</div>
+                <div class="input-group">
+                    <select id="phys_health_consequence" name="phys_health_consequence" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Maybe">Maybe</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q18', 'q17')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q18', 'q19')">Next</button>
+                </div>
+            </div>
+            <!-- Question 19: Coworkers -->
+            <div class="question-card" id="q19">
+                <div class="question-text">Would you discuss mental health with your coworkers?</div>
+                <div class="input-group">
+                    <select id="coworkers" name="coworkers" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Some of them">Some of them</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q19', 'q18')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q19', 'q20')">Next</button>
+                </div>
+            </div>
+            <!-- Question 20: Supervisor -->
+            <div class="question-card" id="q20">
+                <div class="question-text">Would you discuss mental health with your supervisor?</div>
+                <div class="input-group">
+                    <select id="supervisor" name="supervisor" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes</option>
+                        <option value="No">No</option>
+                        <option value="Some of them">Some of them</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q20', 'q19')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q20', 'q21')">Next</button>
+                </div>
+            </div>
+            <!-- Question 21: Mental Health Interview -->
+            <div class="question-card" id="q21">
+                <div class="question-text">Would you bring up mental health in a job interview?</div>
+                <div class="input-group">
+                    <select id="mental_health_interview" name="mental_health_interview" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Maybe">Maybe</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q21', 'q20')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q21', 'q22')">Next</button>
+                </div>
+            </div>
+            <!-- Question 22: Physical Health Interview -->
+            <div class="question-card" id="q22">
+                <div class="question-text">Would you bring up physical health in a job interview?</div>
+                <div class="input-group">
+                    <select id="phys_health_interview" name="phys_health_interview" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Maybe">Maybe</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q22', 'q21')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q22', 'q23')">Next</button>
+                </div>
+            </div>
+            <!-- Question 23: Mental vs Physical -->
+            <div class="question-card" id="q23">
+                <div class="question-text">Does your employer treat mental health as seriously as physical health?</div>
+                <div class="input-group">
+                    <select id="mental_vs_physical" name="mental_vs_physical" required>
+                        <option value="">Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Don't know">Don't know</option>
+                    </select>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q23', 'q22')">Previous</button>
+                    <button type="button" class="nav-button" onclick="nextQuestion('q23', 'q24')">Next</button>
+                </div>
+            </div>
+            <!-- Question 24: Observed Consequence -->
+            <div class="question-card" id="q24">
+                <div class="question-text">Have you observed negative consequences for coworkers discussing mental health?</div>
+                <div class="input-group">
+                    <div class="radio-group">
+                        <input type="radio" id="obs_yes" name="obs_consequence" value="Yes" required>
+                        <label for="obs_yes">Yes</label>
+                        <input type="radio" id="obs_no" name="obs_consequence" value="No">
+                        <label for="obs_no">No</label>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button type="button" class="nav-button" onclick="prevQuestion('q24', 'q23')">Previous</button>
+                    <button type="submit">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        function nextQuestion(currentId, nextId) {
+            document.getElementById(currentId).classList.remove('active');
+            document.getElementById(nextId).classList.add('active');
+            const progress = (parseInt(nextId.replace('q', '')) / 24) * 100;
+            document.querySelector('.progress-fill').style.width = `${progress}%`;
+        }
+        function prevQuestion(currentId, prevId) {
+            document.getElementById(currentId).classList.remove('active');
+            document.getElementById(prevId).classList.add('active');
+            const progress = (parseInt(prevId.replace('q', '')) / 24) * 100;
+            document.querySelector('.progress-fill').style.width = `${progress}%`;
+        }
+    </script>
+</body>
+</html>
