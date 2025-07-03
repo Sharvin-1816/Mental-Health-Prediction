@@ -16,7 +16,7 @@ This project aims to predict whether the user needs a mental health treatment or
 - **Encodings:** Converted categorical data into numerical format for model compatibility.
 
 ## Model
-- **AdaBoost Classifier
+- AdaBoost Classifier
 
 ## Evaluation Metrics
 - **Confusion Matrix:** Evaluated true/false positives and negatives to understand prediction distribution.
