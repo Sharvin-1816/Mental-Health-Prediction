@@ -25,4 +25,4 @@ This project aims to predict whether the user needs a mental health treatment or
 
 ## Website
 
-![landing page](C:\Users\Admin\Pictures\Screenshots\Screenshot 2025-07-03 104329.png "Landing Page")
+![landing page](images/Screenshot 2025-07-03 104329.png "Landing Page")
