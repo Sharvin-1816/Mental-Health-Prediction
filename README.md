@@ -22,3 +22,7 @@ This project aims to predict whether the user needs a mental health treatment or
 - **Confusion Matrix:** Evaluated true/false positives and negatives to understand prediction distribution.
 - **ROC Curve:** Visualized model capability in distinguishing between classes.
 - **Accuracy:** Measured overall correctness of the model predictions.
+
+## Website
+
+![landing page](C:\Users\Admin\Pictures\Screenshots\Screenshot 2025-07-03 104329.png "Landing Page")
