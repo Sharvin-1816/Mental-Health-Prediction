@@ -23,6 +23,3 @@ This project aims to predict whether the user needs a mental health treatment or
 - **ROC Curve:** Visualized model capability in distinguishing between classes.
 - **Accuracy:** Measured overall correctness of the model predictions.
 
-## Website
-
-![landing page](images/Screenshot 2025-07-03 104329.png "Landing Page")
